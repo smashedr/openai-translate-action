@@ -1,0 +1,38 @@
+# https://www.schemastore.org/github-action.json
+name: "OpenAI Translate"
+description: "OpenAI Translate Action. Translate a text or file to any arbitrary languages."
+author: "Shane"
+
+branding:
+  icon: "play-circle"
+  color: "white"
+
+inputs:
+  text:
+    description: "Text to Translate"
+  file:
+    description: "File to Translate"
+  languages:
+    description: "Languages to Translate Too"
+    required: true
+  model:
+    description: "Model to Use"
+    default: "gpt-4.1-mini-2025-04-14"
+  instructions:
+    description: "Extra Instructions"
+  token:
+    description: "OpenAI API Token"
+    #required: true
+  summary:
+    description: "Add Summary to Job"
+    default: "true"
+
+outputs:
+  items:
+    description: "JSON Mapping"
+  results:
+    description: "JSON Array"
+
+runs:
+  using: "node24"
+  main: "dist/index.js"

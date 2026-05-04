@@ -1,0 +1,89 @@
+name: "Test"
+
+# actions-up-ignore-file
+
+on:
+  workflow_dispatch:
+  #schedule:
+  #  - cron: "18 18 * * 1,3,5"
+  #push:
+  #  branches-ignore: [master]
+  #  paths:
+  #    - ".github/workflows/test.yaml"
+  #    - "dist/**"
+  #    - "src/**"
+  #    - "package*.json"
+  #    - "requirements*.txt"
+  #    - "action.yml"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: "Test"
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: "Checkout"
+        uses: actions/checkout@v6
+
+      - name: "Debug event.json"
+        if: ${{ !github.event.act }}
+        continue-on-error: true
+        run: cat "${GITHUB_EVENT_PATH}"
+      - name: "Debug CTX github"
+        if: ${{ !github.event.act }}
+        continue-on-error: true
+        env:
+          GITHUB_CTX: ${{ toJSON(github) }}
+        run: echo "$GITHUB_CTX"
+      - name: "Debug Environment"
+        if: ${{ !github.event.act }}
+        continue-on-error: true
+        run: env
+
+      #- name: "Debug"
+      #  continue-on-error: true
+      #  run: |
+      #    ls -lah .
+
+      - name: "Test Local Action"
+        id: test
+        uses: ./
+        #env:
+        #  OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        with:
+          #text: "This is a test message."
+          file: .github/test/text.md
+          languages: "Spanish"
+          token: ${{ secrets.OPENAI_API_KEY }}
+          summary: ${{ !github.event.act }}
+
+      - name: "Echo Outputs"
+        continue-on-error: true
+        env:
+          items: ${{ steps.test.outputs.items }}
+          results: ${{ steps.test.outputs.results }}
+          spanish: ${{ steps.test.outputs.Spanish }}
+        run: |
+          echo "items: ${items}"
+          echo "results: ${results}"
+          echo "spanish: ${spanish}"
+
+      #- name: "Validate Outputs"
+      #  if: ${{ !github.event.act }}
+      #  uses: cssnr/validate-outputs-action@master
+      #  with:
+      #    outputs: ${{ toJSON(steps.test.outputs) }}
+      #    data: |
+      #      sha: ${{ github.sha }}
+
+      - name: "Schedule Failure Notification"
+        if: ${{ failure() && github.event_name == 'schedule' }}
+        uses: sarisia/actions-status-discord@eb045afee445dc055c18d3d90bd0f244fd062708 # v1.16.0
+        with:
+          webhook: ${{ secrets.DISCORD_WEBHOOK }}
+          description: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
