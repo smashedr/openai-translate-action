@@ -86,7 +86,13 @@ These are arbitrary languages strings. If you need to explain these use [instruc
 
 ### model
 
-Model to use.
+Recommended to use `4.1` (not `5`). Default is `gpt-4.1-mini`.
+
+| Model          | Cost Per 1M Tokens      | Short&nbsp;Description&nbsp;of&nbsp;the&nbsp;Model               |
+| :------------- | :---------------------- | :--------------------------------------------------------------- |
+| `gpt-4.1-nano` | ~$0.10 in / ~$0.40 out  | **Cheapest**. Fast for testing or low-quality translations.      |
+| `gpt-4.1-mini` | ~$0.40 in / ~$1.60 out  | **Best Balance**. Good for most real-world translation tasks.    |
+| `gpt-4.1`      | ~$5.00 in / ~$15.00 out | **Highest Quality**. Best for accurate and complex translations. |
 
 ### instructions
 
@@ -125,11 +131,14 @@ https://github.com/smashedr/openai-translate-action/network/dependents
 
 ## Outputs
 
-| Output     | Description      |
-| :--------- | :--------------- |
-| items      | Results Object   |
-| results    | Results Array    |
-| _language_ | Arbitrary Output |
+| Output        | Description              |
+| :------------ | :----------------------- |
+| items         | Results Object           |
+| results       | Results Array            |
+| _language_    | Arbitrary Output         |
+| input_tokens  | Total Input Tokens Used  |
+| output_tokens | Total Output Tokens Used |
+| total_tokens  | Total Output Tokens Used |
 
 **items** - Mapping of `{"Language": "Result"}`
 
@@ -149,11 +158,19 @@ This lets you reuse the generated `token` or validate the response data.
     token: ${{ secrets.OPENAI_API_KEY }}
 
 - name: 'Echo Outputs'
+  env:
+    items: ${{ steps.test.outputs.items }}
+    results: ${{ steps.test.outputs.results }}
+    spanish: ${{ steps.test.outputs.Spanish }}
+    french: ${{ steps.test.outputs.French }}
   run: |
-    echo "items: ${{ steps.translate.outputs.items }}"
-    echo "results: ${{ steps.translate.outputs.results }}}"
-    echo "Spanish: ${{ steps.translate.outputs.Spanish }}"
-    echo "French: ${{ steps.translate.outputs.French }}"
+    echo "input_tokens: ${input_tokens}"
+    echo "output_tokens: ${output_tokens}"
+    echo "total_tokens: ${total_tokens}"
+    echo "items: ${items}"
+    echo "results: ${results}"
+    echo "spanish: ${spanish}"
+    echo "french: ${french}"
 ```
 
 Note: Multi-line outputs get evaluated using `${{ }}` in a `run` block.

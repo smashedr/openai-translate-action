@@ -17,7 +17,7 @@ inputs:
     required: true
   model:
     description: "Model to Use"
-    default: "gpt-4.1-mini-2025-04-14"
+    default: "gpt-4.1-mini"
   instructions:
     description: "Extra Instructions"
   token:
@@ -32,6 +32,12 @@ outputs:
     description: "JSON Mapping"
   results:
     description: "JSON Array"
+  input_tokens:
+    description: "Total Input Tokens Used"
+  output_tokens:
+    description: "Total Output Tokens Used"
+  total_tokens:
+    description: "Total Tokens Used"
 
 runs:
   using: "node24"
