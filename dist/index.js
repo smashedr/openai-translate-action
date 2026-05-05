@@ -59475,8 +59475,8 @@ const inputs = {
     text: getInput('text'),
     file: getInput('file'),
     languages: getInput('languages', { required: true }),
-    model: getInput('model', { required: true }),
     instructions: getInput('instructions'),
+    model: getInput('model', { required: true }),
     token: getInput('token'),
     summary: getBooleanInput('summary'),
 };

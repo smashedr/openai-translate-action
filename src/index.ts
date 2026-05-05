@@ -10,8 +10,8 @@ const inputs = {
   text: core.getInput('text'),
   file: core.getInput('file'),
   languages: core.getInput('languages', { required: true }),
-  model: core.getInput('model', { required: true }),
   instructions: core.getInput('instructions'),
+  model: core.getInput('model', { required: true }),
   token: core.getInput('token'),
   summary: core.getBooleanInput('summary'),
 } as const

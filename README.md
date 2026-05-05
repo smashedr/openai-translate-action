@@ -2,7 +2,7 @@
 [![GitHub Tag Minor](https://img.shields.io/github/v/tag/smashedr/openai-translate-action?sort=semver&filter=!v*.*.*&logo=git&logoColor=white&labelColor=585858&label=%20)](https://github.com/smashedr/openai-translate-action/releases)
 [![GitHub Release Version](https://img.shields.io/github/v/release/smashedr/openai-translate-action?logo=git&logoColor=white&labelColor=585858&label=%20)](https://github.com/smashedr/openai-translate-action/releases/latest)
 [![GitHub Dist Size](https://img.shields.io/github/size/smashedr/openai-translate-action/dist%2Findex.js?logo=bookstack&logoColor=white&label=dist%20size)](https://github.com/smashedr/openai-translate-action/blob/master/src)
-[![Action Run Using](https://img.shields.io/badge/dynamic/yaml?url=https%3A%2F%2Fraw.githubusercontent.com%2Fcssnr%2Factionlint-action%2Frefs%2Fheads%2Fmaster%2Faction.yml&query=%24.runs.using&logo=githubactions&logoColor=white&label=runs)](https://github.com/cssnr/actionlint-action/blob/master/action.yml)
+[![Action Run Using](https://img.shields.io/badge/dynamic/yaml?url=https%3A%2F%2Fraw.githubusercontent.com%2Fsmashedr%2Fopenai-translate-action%2Frefs%2Fheads%2Fmaster%2Faction.yml&query=%24.runs.using&logo=githubactions&logoColor=white&label=runs)](https://github.com/cssnr/actionlint-action/blob/master/action.yml)
 [![Workflow Release](https://img.shields.io/github/actions/workflow/status/smashedr/openai-translate-action/release.yaml?logo=norton&logoColor=white&label=release)](https://github.com/smashedr/openai-translate-action/actions/workflows/release.yaml)
 [![Workflow Lint](https://img.shields.io/github/actions/workflow/status/smashedr/openai-translate-action/lint.yaml?logo=norton&logoColor=white&label=lint)](https://github.com/smashedr/openai-translate-action/actions/workflows/lint.yaml)
 [![GitHub Last Commit](https://img.shields.io/github/last-commit/smashedr/openai-translate-action?logo=github&label=updated)](https://github.com/smashedr/openai-translate-action)
@@ -40,7 +40,7 @@ OpenAI Translate Action. Translate a text or file to any arbitrary languages.
   #  OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
   with:
     text: 'This is a test message.'
-    #file: text.txt  # or a file
+    #file: text.md  # or a file
     languages: 'Spanish,French'
     token: ${{ secrets.OPENAI_API_KEY }}
 ```
@@ -62,8 +62,8 @@ OpenAI Translate Action. Translate a text or file to any arbitrary languages.
 | [text](#text)                 |    -    |       -        | Text to Translate          |
 | [file](#file)                 |    -    |       -        | File to Translate          |
 | [languages](#languages)       | **Yes** |       -        | Languages to Translate Too |
-| [model](#model)               |    -    | `gpt-4.1-mini` | Model to Use               |
 | [instructions](#instructions) |    -    |       -        | Extra Instructions         |
+| [model](#model)               |    -    | `gpt-4.1-mini` | Model to Use               |
 | **token**                     | **Yes** |       -        | OpenAI API Token           |
 | **summary**                   |    -    |     `true`     | Add Summary to Job         |
 
@@ -84,6 +84,10 @@ File to read text to translate.
 Languages to translate too. This can be a comma seperated string or a new-line delimited list.
 These are arbitrary languages strings. If you need to explain these use [instructions](#instructions).
 
+### instructions
+
+Extra instruction for translation.
+
 ### model
 
 Recommended to use `4.1` (not `5`). Default is `gpt-4.1-mini`.
@@ -94,9 +98,7 @@ Recommended to use `4.1` (not `5`). Default is `gpt-4.1-mini`.
 | `gpt-4.1-mini` | ~$0.40 in / ~$1.60 out  | **Best Balance**. Good for most real-world translation tasks.    |
 | `gpt-4.1`      | ~$5.00 in / ~$15.00 out | **Highest Quality**. Best for accurate and complex translations. |
 
-### instructions
-
-Extra instruction for translation.
+More Details: <https://developers.openai.com/api/docs/models/all>
 
 ## Examples
 
@@ -119,7 +121,7 @@ With file and new-line delimited languages using environment token.
   env:
     OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
   with:
-    file: text.txt
+    file: text.md
     languages: |
       Spanish
       French

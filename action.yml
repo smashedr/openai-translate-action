@@ -4,8 +4,8 @@ description: "OpenAI Translate Action. Translate a text or file to any arbitrary
 author: "Shane"
 
 branding:
-  icon: "play-circle"
-  color: "white"
+  icon: "file-text"
+  color: "blue"
 
 inputs:
   text:
@@ -15,14 +15,13 @@ inputs:
   languages:
     description: "Languages to Translate Too"
     required: true
+  instructions:
+    description: "Extra Instructions"
   model:
     description: "Model to Use"
     default: "gpt-4.1-mini"
-  instructions:
-    description: "Extra Instructions"
   token:
     description: "OpenAI API Token"
-    #required: true
   summary:
     description: "Add Summary to Job"
     default: "true"
