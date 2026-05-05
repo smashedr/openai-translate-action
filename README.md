@@ -36,13 +36,13 @@ OpenAI Translate Action. Translate a text or file to any arbitrary languages.
 ```yaml
 - name: 'OpenAI Translate'
   uses: smashedr/openai-translate-action@master
-  #env:
-  #  OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+  env:
+    OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
   with:
     text: 'This is a test message.'
     #file: text.md  # or a file
     languages: 'Spanish,French'
-    token: ${{ secrets.OPENAI_API_KEY }}
+    model: 'gpt-4.1-mini' # default
 ```
 
 ## Features
@@ -67,9 +67,9 @@ OpenAI Translate Action. Translate a text or file to any arbitrary languages.
 | **token**                     | **Yes** |       -        | OpenAI API Token           |
 | **summary**                   |    -    |     `true`     | Add Summary to Job         |
 
-Note: The token can be provided with the `OPENAI_API_KEY` environment variable or the `token` input.
+Note: The API Key can be provided with the `OPENAI_API_KEY` environment variable or the `token` input.
 
-You can create an OpenAI API Key here: https://platform.openai.com/api-keys
+You can create and manage an OpenAI API Key here: https://platform.openai.com/api-keys
 
 #### text
 
@@ -92,11 +92,11 @@ Extra instruction for translation.
 
 Recommended to use `4.1` (not `5`). Default is `gpt-4.1-mini`.
 
-| Model          | Cost Per 1M Tokens      | Short&nbsp;Description&nbsp;of&nbsp;the&nbsp;Model               |
-| :------------- | :---------------------- | :--------------------------------------------------------------- |
-| `gpt-4.1-nano` | ~$0.10 in / ~$0.40 out  | **Cheapest**. Fast for testing or low-quality translations.      |
-| `gpt-4.1-mini` | ~$0.40 in / ~$1.60 out  | **Best Balance**. Good for most real-world translation tasks.    |
-| `gpt-4.1`      | ~$5.00 in / ~$15.00 out | **Highest Quality**. Best for accurate and complex translations. |
+| Model                                                                      | Cost Per 1M Tokens   | Short&nbsp;Description&nbsp;of&nbsp;the&nbsp;Model               |
+| :------------------------------------------------------------------------- | :------------------- | :--------------------------------------------------------------- |
+| [gpt-4.1-nano](https://developers.openai.com/api/docs/models/gpt-4.1-nano) | $0.10 in / $0.40 out | **Cheapest**. Fast for testing or low-quality translations.      |
+| [gpt-4.1-mini](https://developers.openai.com/api/docs/models/gpt-4.1-mini) | $0.40 in / $1.60 out | **Best Balance**. Good for most real-world translation tasks.    |
+| [gpt-4.1](https://developers.openai.com/api/docs/models/gpt-4.1)           | $2.00 in / $8.00 out | **Highest Quality**. Best for accurate and complex translations. |
 
 More Details: <https://developers.openai.com/api/docs/models/all>
 
@@ -148,8 +148,6 @@ https://github.com/smashedr/openai-translate-action/network/dependents
 
 **language** - Named output based in input language (see example below)
 
-This lets you reuse the generated `token` or validate the response data.
-
 ```yaml
 - name: 'OpenAI Translate'
   id: translate
@@ -161,14 +159,14 @@ This lets you reuse the generated `token` or validate the response data.
 
 - name: 'Echo Outputs'
   env:
-    items: ${{ steps.test.outputs.items }}
-    results: ${{ steps.test.outputs.results }}
-    spanish: ${{ steps.test.outputs.Spanish }}
-    french: ${{ steps.test.outputs.French }}
+    items: ${{ steps.translate.outputs.items }}
+    results: ${{ steps.translate.outputs.results }}
+    spanish: ${{ steps.translate.outputs.Spanish }}
+    french: ${{ steps.translate.outputs.French }}
   run: |
-    echo "input_tokens: ${input_tokens}"
-    echo "output_tokens: ${output_tokens}"
-    echo "total_tokens: ${total_tokens}"
+    echo "input_tokens: ${{ steps.translate.outputs.input_tokens }}"
+    echo "output_tokens: ${{ steps.translate.outputs.output_tokens }}"
+    echo "total_tokens: ${{ steps.translate.outputs.total_tokens }}"
     echo "items: ${items}"
     echo "results: ${results}"
     echo "spanish: ${spanish}"
