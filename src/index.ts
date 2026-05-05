@@ -10,8 +10,8 @@ const inputs = {
   text: core.getInput('text'),
   file: core.getInput('file'),
   languages: core.getInput('languages', { required: true }),
-  model: core.getInput('model', { required: true }),
   instructions: core.getInput('instructions'),
+  model: core.getInput('model', { required: true }),
   token: core.getInput('token'),
   summary: core.getBooleanInput('summary'),
 } as const
@@ -68,7 +68,7 @@ async function main() /* NOSONAR */ {
       return core.setFailed(`Input file does not exist: ${inputs.file}`)
     }
     const file = readFileSync(inputs.file)
-    const text = file.toString()
+    const text = file.toString().trim()
     console.log('file text:', text)
     PROMPT.input = text
   }
@@ -77,12 +77,15 @@ async function main() /* NOSONAR */ {
   // // Process
   // const api = new OpenAI(inputs.token)
   if (inputs.token) process.env.OPENAI_API_KEY = inputs.token
-  console.log('OPENAI_API_KEY:', process.env.OPENAI_API_KEY)
+  // console.log('OPENAI_API_KEY:', process.env.OPENAI_API_KEY)
   if (!process.env.OPENAI_API_KEY) return core.setFailed('Missing OpenAI API Key')
   const client = new OpenAI()
 
   const items: Record<string, string> = {}
   const results: string[] = []
+
+  let input_tokens = 0
+  let output_tokens = 0
 
   for (const language of languages) {
     console.log('language:', language)
@@ -95,14 +98,26 @@ async function main() /* NOSONAR */ {
     // console.log('text:', text)
 
     const response = await client.responses.create(prompt)
-    console.log('response:', response)
+    core.startGroup('Response')
+    console.log(response)
+    core.endGroup() // Response
+
+    if (response.usage?.input_tokens) input_tokens += response.usage.input_tokens
+    if (response.usage?.output_tokens) output_tokens += response.usage.output_tokens
 
     results.push(response.output_text)
     items[language] = response.output_text
   }
 
-  console.log('items:', items)
-  console.log('results:', results)
+  core.startGroup('items')
+  console.log(JSON.stringify(items, null, 2))
+  core.endGroup() // items
+  core.startGroup('results')
+  console.log(results)
+  core.endGroup() // results
+
+  console.log('input_tokens:', input_tokens)
+  console.log('output_tokens:', output_tokens)
 
   // // Summary
   // if (inputs.summary) {
@@ -119,6 +134,9 @@ async function main() /* NOSONAR */ {
   core.info('📩 Setting Outputs')
   core.setOutput('items', items)
   core.setOutput('results', results)
+  core.setOutput('input_tokens', input_tokens)
+  core.setOutput('output_tokens', output_tokens)
+  core.setOutput('total_tokens', input_tokens + output_tokens)
   for (const [key, value] of Object.entries(items)) {
     console.log(`key: ${key}:`, value)
     core.info(`Set Output: ${key}`)

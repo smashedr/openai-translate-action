@@ -56,9 +56,10 @@ jobs:
         #env:
         #  OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         with:
+          model: "gpt-4.1-nano"
           #text: "This is a test message."
           file: .github/test/text.md
-          languages: "Spanish"
+          languages: "es-MX,fr"
           token: ${{ secrets.OPENAI_API_KEY }}
           summary: ${{ !github.event.act }}
 
@@ -67,11 +68,16 @@ jobs:
         env:
           items: ${{ steps.test.outputs.items }}
           results: ${{ steps.test.outputs.results }}
-          spanish: ${{ steps.test.outputs.Spanish }}
+          spanish: ${{ steps.test.outputs.es-MX }}
+          french: ${{ steps.test.outputs.fr }}
         run: |
+          echo "input_tokens: ${{ steps.test.outputs.input_tokens }}"
+          echo "output_tokens: ${{ steps.test.outputs.output_tokens }}"
+          echo "total_tokens: ${{ steps.test.outputs.total_tokens }}"
           echo "items: ${items}"
           echo "results: ${results}"
           echo "spanish: ${spanish}"
+          echo "french: ${french}"
 
       #- name: "Validate Outputs"
       #  if: ${{ !github.event.act }}

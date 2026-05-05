@@ -112,6 +112,9 @@ function issueCommand(command, properties, message) {
     const cmd = new Command(command, properties, message);
     process.stdout.write(cmd.toString() + os.EOL);
 }
+function issue(name, message = '') {
+    issueCommand(name, {}, message);
+}
 const CMD_STRING = '::';
 class Command {
     constructor(command, properties, message) {
@@ -28190,6 +28193,22 @@ function error(message, properties = {}) {
  */
 function info(message) {
     process.stdout.write(message + os.EOL);
+}
+/**
+ * Begin an output group.
+ *
+ * Output until the next `groupEnd` will be foldable in this group
+ *
+ * @param name The name of the output group
+ */
+function startGroup(name) {
+    issue('group', name);
+}
+/**
+ * End an output group.
+ */
+function endGroup() {
+    issue('endgroup');
 }
 
 /**
@@ -59456,8 +59475,8 @@ const inputs = {
     text: getInput('text'),
     file: getInput('file'),
     languages: getInput('languages', { required: true }),
-    model: getInput('model', { required: true }),
     instructions: getInput('instructions'),
+    model: getInput('model', { required: true }),
     token: getInput('token'),
     summary: getBooleanInput('summary'),
 };
@@ -59489,32 +59508,48 @@ async function main() {
             return setFailed(`Input file does not exist: ${inputs.file}`);
         }
         const file = readFileSync(inputs.file);
-        const text = file.toString();
+        const text = file.toString().trim();
         console.log('file text:', text);
         PROMPT.input = text;
     }
     if (inputs.token)
         process.env.OPENAI_API_KEY = inputs.token;
-    console.log('OPENAI_API_KEY:', process.env.OPENAI_API_KEY);
     if (!process.env.OPENAI_API_KEY)
         return setFailed('Missing OpenAI API Key');
     const client = new OpenAI();
     const items = {};
     const results = [];
+    let input_tokens = 0;
+    let output_tokens = 0;
     for (const language of languages) {
         console.log('language:', language);
         const prompt = getPrompt(language);
         console.log('prompt:', prompt);
         const response = await client.responses.create(prompt);
-        console.log('response:', response);
+        startGroup('Response');
+        console.log(response);
+        endGroup();
+        if (response.usage?.input_tokens)
+            input_tokens += response.usage.input_tokens;
+        if (response.usage?.output_tokens)
+            output_tokens += response.usage.output_tokens;
         results.push(response.output_text);
         items[language] = response.output_text;
     }
-    console.log('items:', items);
-    console.log('results:', results);
+    startGroup('items');
+    console.log(JSON.stringify(items, null, 2));
+    endGroup();
+    startGroup('results');
+    console.log(results);
+    endGroup();
+    console.log('input_tokens:', input_tokens);
+    console.log('output_tokens:', output_tokens);
     info('📩 Setting Outputs');
     setOutput('items', items);
     setOutput('results', results);
+    setOutput('input_tokens', input_tokens);
+    setOutput('output_tokens', output_tokens);
+    setOutput('total_tokens', input_tokens + output_tokens);
     for (const [key, value] of Object.entries(items)) {
         console.log(`key: ${key}:`, value);
         info(`Set Output: ${key}`);
